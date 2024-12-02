@@ -21,22 +21,22 @@ public static class AppBuilderExtensions
     {
         if (Environment.OSVersion.Platform == PlatformID.Win32NT)
         {
-            var context = WindowsApplicationContext.FromCurrentProcess();
+            var context = WindowsApplicationContext.FromCurrentProcess("Babble App");
             manager = new WindowsNotificationManager(context);
         }
         else if (Environment.OSVersion.Platform == PlatformID.Unix)
         {
-            var context = FreeDesktopApplicationContext.FromCurrentProcess();
+            var context = FreeDesktopApplicationContext.FromCurrentProcess("Icon_512x512.png"); // From Babble.Avalonia.Desktop
             manager = new FreeDesktopNotificationManager(context);
         }
         else
         {
-            //TODO: OSX once implemented/stable
+            // TODO: OSX once implemented/stable
             manager = null;
             return builder;
         }
 
-        //TODO Any better way of doing this?
+        // TODO Any better way of doing this?
         manager.Initialize().GetAwaiter().GetResult();
 
         var manager_ = manager;
