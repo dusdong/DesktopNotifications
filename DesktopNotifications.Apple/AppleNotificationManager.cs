@@ -13,7 +13,7 @@ namespace DesktopNotifications.Apple
         {
         }
 
-        public NotificationManagerCapabilities Capabilities => NotificationManagerCapabilities.None;
+        public NotificationManagerCapabilities Capabilities => NotificationManagerCapabilities.BodyText;
 
         public event EventHandler<NotificationActivatedEventArgs>? NotificationActivated;
         public event EventHandler<NotificationDismissedEventArgs>? NotificationDismissed;
