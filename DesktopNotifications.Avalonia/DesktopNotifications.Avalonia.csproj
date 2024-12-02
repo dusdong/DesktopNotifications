@@ -12,7 +12,7 @@
 		<Nullable>enable</Nullable>
 		<LangVersion>latest</LangVersion>
 		<Description>A cross-platform C# library for native desktop "toast" notifications.</Description>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageProjectUrl>https://github.com/pr8x/DesktopNotifications</PackageProjectUrl>
 	</PropertyGroup>
