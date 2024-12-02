@@ -2,7 +2,8 @@
 using Avalonia.Controls.ApplicationLifetimes;
 using DesktopNotifications.FreeDesktop;
 using DesktopNotifications.Windows;
-using System;
+using DesktopNotifications.Apple;
+using System.Runtime.InteropServices;
 
 namespace DesktopNotifications.Avalonia;
 
@@ -19,24 +20,22 @@ public static class AppBuilderExtensions
     /// <returns></returns>
     public static AppBuilder SetupDesktopNotifications(this AppBuilder builder, out INotificationManager? manager)
     {
-        if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+        manager = null;
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             var context = WindowsApplicationContext.FromCurrentProcess("Babble App");
             manager = new WindowsNotificationManager(context);
         }
-        else if (Environment.OSVersion.Platform == PlatformID.Unix)
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            manager = new AppleNotificationManager();
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
             var context = FreeDesktopApplicationContext.FromCurrentProcess("Icon_512x512.png"); // From Babble.Avalonia.Desktop
             manager = new FreeDesktopNotificationManager(context);
         }
-        else
-        {
-            // TODO: OSX once implemented/stable
-            manager = null;
-            return builder;
-        }
 
-        // TODO Any better way of doing this?
         manager.Initialize().GetAwaiter().GetResult();
 
         var manager_ = manager;
