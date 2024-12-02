@@ -35,6 +35,11 @@ public static class AppBuilderExtensions
             var context = FreeDesktopApplicationContext.FromCurrentProcess("Icon_512x512.png"); // From Babble.Avalonia.Desktop
             manager = new FreeDesktopNotificationManager(context);
         }
+        else
+        {
+            manager = null;
+            return builder;
+        }
 
         manager.Initialize().GetAwaiter().GetResult();
 
