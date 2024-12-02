@@ -4,6 +4,7 @@ using DesktopNotifications.FreeDesktop;
 using DesktopNotifications.Windows;
 using DesktopNotifications.Apple;
 using System.Runtime.InteropServices;
+using System;
 
 namespace DesktopNotifications.Avalonia;
 
@@ -37,11 +38,20 @@ public static class AppBuilderExtensions
         }
         else
         {
+            // We don't have an implementation for this platform (what are you running this on??)
             manager = null;
             return builder;
         }
 
-        manager.Initialize().GetAwaiter().GetResult();
+        try
+        {
+            manager.Initialize().GetAwaiter().GetResult();
+        }
+        catch (Exception e)
+        {
+            // Notifications are disabled, just skip
+            return builder;
+        }
 
         var manager_ = manager;
         builder.AfterSetup(b =>
