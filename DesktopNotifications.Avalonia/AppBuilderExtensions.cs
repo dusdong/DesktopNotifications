@@ -53,12 +53,12 @@ public static class AppBuilderExtensions
             return builder;
         }
 
-        var manager_ = manager;
+        var managerCopy = manager;
         builder.AfterSetup(b =>
         {
             if (b.Instance?.ApplicationLifetime is IControlledApplicationLifetime lifetime)
             {
-                lifetime.Exit += (s, e) => { manager_.Dispose(); };
+                lifetime.Exit += (_, _) => { managerCopy.Dispose(); };
             }
         });
 
