@@ -1,56 +1,67 @@
 ﻿using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Platform;
 using DesktopNotifications.FreeDesktop;
 using DesktopNotifications.Windows;
+using DesktopNotifications.Apple;
+using System.Runtime.InteropServices;
 using System;
 
-namespace DesktopNotifications.Avalonia
+namespace DesktopNotifications.Avalonia;
+
+/// <summary>
+/// Extensions for <see cref="AppBuilder" />
+/// </summary>
+public static class AppBuilderExtensions
 {
     /// <summary>
-    /// Extensions for <see cref="AppBuilder" />
+    /// Setups the <see cref="INotificationManager" /> for the current platform and
+    /// binds it to the service locator (<see cref="AvaloniaLocator" />).
     /// </summary>
-    public static class AppBuilderExtensions
+    /// <param name="builder"></param>
+    /// <returns></returns>
+    public static AppBuilder SetupDesktopNotifications(this AppBuilder builder, out INotificationManager? manager)
     {
-        /// <summary>
-        /// Setups the <see cref="INotificationManager" /> for the current platform and
-        /// binds it to the service locator (<see cref="AvaloniaLocator" />).
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <returns></returns>
-        public static AppBuilder SetupDesktopNotifications(this AppBuilder builder, out INotificationManager? manager)
+        manager = null;
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-            {
-                var context = WindowsApplicationContext.FromCurrentProcess();
-                manager = new WindowsNotificationManager(context);
-            }
-            else if (Environment.OSVersion.Platform == PlatformID.Unix)
-            {
-                var context = FreeDesktopApplicationContext.FromCurrentProcess();
-                manager = new FreeDesktopNotificationManager(context);
-            }
-            else
-            {
-                //TODO: OSX once implemented/stable
-                manager = null;
-                return builder;
-            }
-
-            //TODO Any better way of doing this?
-            manager.Initialize().GetAwaiter().GetResult();
-
-            var manager_ = manager;
-            builder.AfterSetup(b =>
-            {
-                if (b.Instance?.ApplicationLifetime is IControlledApplicationLifetime lifetime)
-                {
-                    lifetime.Exit += (s, e) => { manager_.Dispose(); };
-                }
-            });
-
+            var context = WindowsApplicationContext.FromCurrentProcess("Babble App");
+            manager = new WindowsNotificationManager(context);
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            manager = new AppleNotificationManager();
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            var context = FreeDesktopApplicationContext.FromCurrentProcess("Icon_512x512.png"); // From Babble.Avalonia.Desktop
+            manager = new FreeDesktopNotificationManager(context);
+        }
+        else
+        {
+            // We don't have an implementation for this platform (what are you running this on??)
+            manager = null;
             return builder;
         }
+
+        try
+        {
+            manager.Initialize().GetAwaiter().GetResult();
+        }
+        catch (Exception e)
+        {
+            // Notifications are disabled, just skip
+            return builder;
+        }
+
+        var managerCopy = manager;
+        builder.AfterSetup(b =>
+        {
+            if (b.Instance?.ApplicationLifetime is IControlledApplicationLifetime lifetime)
+            {
+                lifetime.Exit += (_, _) => { managerCopy.Dispose(); };
+            }
+        });
+
+        return builder;
     }
 }
