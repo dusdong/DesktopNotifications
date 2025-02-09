@@ -29,6 +29,28 @@ namespace DesktopNotifications.Apple
             ExecuteBashCommand($"osascript -e 'display notification \"{notification.Body}\" with title \"{notification.Title}\"'");
             return Task.CompletedTask;
         }
+        
+        private void ExecuteBashCommand(string command)
+        {
+            // According to: https://stackoverflow.com/a/15262019/637142/
+            // And https://stackoverflow.com/questions/23029218/run-bash-commands-from-mono-c-sharp
+            // Thanks to this we will pass everything as one command
+            command = command.Replace("\"","\"\"");
+
+            var proc = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "/bin/bash",
+                    Arguments = "-c \""+ command + "\"",
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                }
+            };
+
+            proc.Start();
+            proc.WaitForExit();
+        }
 
         private void ExecuteBashCommand(string command)
         {
