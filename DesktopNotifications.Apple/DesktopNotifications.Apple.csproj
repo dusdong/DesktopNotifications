@@ -19,6 +19,8 @@
 		<Product>DesktopNotifications.Apple</Product>
 		<Company>DesktopNotifications.Apple</Company>
 		<IsPackable>false</IsPackable>
+		<Configurations>Debug;Release;Linux Debug;Windows Release;MacOS Debug;Windows Debug;MacOS Release;Linux Release</Configurations>
+		<Platforms>AnyCPU</Platforms>
 	</PropertyGroup>
 
 	<ItemGroup>
