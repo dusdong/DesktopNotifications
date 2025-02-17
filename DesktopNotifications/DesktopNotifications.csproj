@@ -16,7 +16,7 @@
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageProjectUrl>https://github.com/pr8x/DesktopNotifications</PackageProjectUrl>
 		<IsPackable>false</IsPackable>
-		<Configurations>Debug;Release;Linux Debug;Windows Release;MacOS Debug;Windows Debug;MacOS Release;Linux Release</Configurations>
+		<Configurations>Linux Debug;Windows Release;MacOS Debug;Windows Debug;MacOS Release;Linux Release</Configurations>
 		<Platforms>AnyCPU</Platforms>
 	</PropertyGroup>
 
