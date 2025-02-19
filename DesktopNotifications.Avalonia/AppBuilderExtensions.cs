@@ -24,6 +24,8 @@ public static class AppBuilderExtensions
         manager = null;
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
+            // On Windows, setting the TargetOS to 10.0.17763.0 fixes things
+            // https://github.com/pr8x/DesktopNotifications/issues/27
             var context = WindowsApplicationContext.FromCurrentProcess("Babble App");
             manager = new WindowsNotificationManager(context);
         }
