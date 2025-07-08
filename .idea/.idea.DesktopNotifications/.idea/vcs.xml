@@ -2,11 +2,10 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../.." vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../Ava.Controls-Eremex" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/.." vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../Ava.Controls-Eremex" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/../Ava.Controls-Eremex/Eremex.Avalonia.Themes.DeltaDesign" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/../Ava.Controls-Eremex/Eremex.Controls" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/../Ava.Controls-Eremex/Eremex.Controls-Demo" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../FluentAvalonia" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../Icons.Avalonia" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../Semi.Avalonia" vcs="Git" />
@@ -15,5 +14,8 @@
     <mapping directory="$PROJECT_DIR$/../Ursa.Avalonia" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../WalletWasabi" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../v2rayN" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../DtronixPdf" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../PdfPig" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../ZXing.Net" vcs="Git" />
   </component>
 </project>

@@ -76,9 +76,12 @@ namespace DesktopNotifications.Windows
 
         public Task ShowNotification(Notification notification, DateTimeOffset? expirationTime)
         {
-            if (expirationTime < DateTimeOffset.Now)
+            if (notification == null)
+                throw new ArgumentNullException(nameof(notification));
+
+            if (expirationTime.HasValue && expirationTime.Value < DateTimeOffset.Now)
             {
-                throw new ArgumentException(nameof(expirationTime));
+                throw new ArgumentException("Expiration time cannot be in the past", nameof(expirationTime));
             }
 
             var xmlContent = GenerateXml(notification);
@@ -117,9 +120,19 @@ namespace DesktopNotifications.Windows
             DateTimeOffset deliveryTime,
             DateTimeOffset? expirationTime = null)
         {
-            if (deliveryTime < DateTimeOffset.Now || deliveryTime > expirationTime)
+            if (notification == null)
+                throw new ArgumentNullException(nameof(notification));
+
+            if (deliveryTime < DateTimeOffset.Now)
             {
-                throw new ArgumentException(nameof(deliveryTime));
+                throw new NotificationSchedulingException(deliveryTime, 
+                    "Delivery time cannot be in the past");
+            }
+
+            if (expirationTime.HasValue && deliveryTime > expirationTime.Value)
+            {
+                throw new NotificationSchedulingException(deliveryTime, 
+                    "Delivery time cannot be after expiration time");
             }
 
             var xmlContent = GenerateXml(notification);
@@ -233,7 +246,9 @@ namespace DesktopNotifications.Windows
 
         private static void ToastNotificationOnFailed(ToastNotification sender, ToastFailedEventArgs args)
         {
-            throw args.ErrorCode;
+            throw new NotificationDeliveryException(
+                $"Toast notification failed with error code: {args.ErrorCode}", 
+                args.ErrorCode);
         }
 
         private void ToastNotificationOnDismissed(ToastNotification sender, ToastDismissedEventArgs args)

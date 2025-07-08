@@ -34,9 +34,10 @@ namespace DesktopNotifications
         event EventHandler<NotificationDismissedEventArgs> NotificationDismissed;
 
         /// <summary>
-        /// Initialized the notification manager.
+        /// Initializes the notification manager.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A task representing the asynchronous initialization operation.</returns>
+        /// <exception cref="NotificationInitializationException">Thrown when initialization fails.</exception>
         Task Initialize();
 
         /// <summary>
@@ -44,6 +45,10 @@ namespace DesktopNotifications
         /// </summary>
         /// <param name="notification">The notification to present.</param>
         /// <param name="expirationTime">The expiration time marking the point when the notification gets removed.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when notification is null.</exception>
+        /// <exception cref="ArgumentException">Thrown when expirationTime is in the past.</exception>
+        /// <exception cref="NotificationDeliveryException">Thrown when the notification delivery fails.</exception>
         Task ShowNotification(Notification notification, DateTimeOffset? expirationTime = null);
 
         /// <summary>
@@ -51,14 +56,19 @@ namespace DesktopNotifications
         /// If the notification is scheduled for delivery the schedule will be cancelled.
         /// </summary>
         /// <param name="notification">The notification to hide</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when notification is null.</exception>
         Task HideNotification(Notification notification);
 
         /// <summary>
+        /// 调度一个通知在指定时间发送
         /// </summary>
-        /// <param name="notification"></param>
-        /// <param name="deliveryTime"></param>
-        /// <param name="expirationTime"></param>
-        /// <returns></returns>
+        /// <param name="notification">要发送的通知</param>
+        /// <param name="deliveryTime">通知发送时间</param>
+        /// <param name="expirationTime">通知过期时间（可选）</param>
+        /// <returns>表示异步操作的任务</returns>
+        /// <exception cref="ArgumentNullException">当notification为null时抛出</exception>
+        /// <exception cref="NotificationSchedulingException">当deliveryTime无效时抛出</exception>
         Task ScheduleNotification(
             Notification notification,
             DateTimeOffset deliveryTime,

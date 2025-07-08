@@ -87,11 +87,14 @@ namespace DesktopNotifications.FreeDesktop
 
         public async Task ShowNotification(Notification notification, DateTimeOffset? expirationTime = null)
         {
+            if (notification == null)
+                throw new ArgumentNullException(nameof(notification));
+
             CheckConnection();
 
-            if (expirationTime < DateTimeOffset.Now)
+            if (expirationTime.HasValue && expirationTime.Value < DateTimeOffset.Now)
             {
-                throw new ArgumentException(nameof(expirationTime));
+                throw new ArgumentException("Expiration time cannot be in the past", nameof(expirationTime));
             }
 
             var duration = expirationTime - DateTimeOffset.Now;
@@ -126,11 +129,21 @@ namespace DesktopNotifications.FreeDesktop
             DateTimeOffset deliveryTime,
             DateTimeOffset? expirationTime = null)
         {
+            if (notification == null)
+                throw new ArgumentNullException(nameof(notification));
+
             CheckConnection();
 
-            if (deliveryTime < DateTimeOffset.Now || deliveryTime > expirationTime)
+            if (deliveryTime < DateTimeOffset.Now)
             {
-                throw new ArgumentException(nameof(deliveryTime));
+                throw new NotificationSchedulingException(deliveryTime, 
+                    "Delivery time cannot be in the past");
+            }
+
+            if (expirationTime.HasValue && deliveryTime > expirationTime.Value)
+            {
+                throw new NotificationSchedulingException(deliveryTime, 
+                    "Delivery time cannot be after expiration time");
             }
 
             //Note: We could consider spawning some daemon that sends the notification at the specified time.
