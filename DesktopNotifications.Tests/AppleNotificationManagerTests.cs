@@ -1,5 +1,6 @@
 using DesktopNotifications.Apple;
 using FluentAssertions;
+using System.Runtime.InteropServices;
 using Xunit;
 
 namespace DesktopNotifications.Tests
@@ -17,7 +18,7 @@ namespace DesktopNotifications.Tests
 
             // Assert
             manager.Should().NotBeNull();
-            manager.Capabilities.Should().Be(NotificationManagerCapabilities.BodyText);
+            manager.Capabilities.Should().Be(NotificationManagerCapabilities.BodyText | NotificationManagerCapabilities.Icon);
             manager.LaunchActionId.Should().BeNull();
         }
 
@@ -46,9 +47,30 @@ namespace DesktopNotifications.Tests
                 Body = "Test Body"
             };
 
+            // Note: This test will fail on non-macOS platforms, but demonstrates the API
             // Act & Assert
-            var act = async () => await manager.ShowNotification(notification);
-            await act.Should().NotThrowAsync();
+            var act = async () => 
+            {
+                if (AppleNotificationManager.IsSupported())
+                {
+                    await manager.Initialize();
+                    await manager.ShowNotification(notification);
+                }
+                else
+                {
+                    // On non-macOS platforms, we expect initialization to fail
+                    await manager.Initialize();
+                }
+            };
+            
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                await act.Should().NotThrowAsync();
+            }
+            else
+            {
+                await act.Should().ThrowAsync<NotificationInitializationException>();
+            }
         }
 
         [Fact]
@@ -128,7 +150,7 @@ namespace DesktopNotifications.Tests
             // Act & Assert
             var act = async () => await manager.ScheduleNotification(notification, deliveryTime);
             await act.Should().ThrowAsync<NotSupportedException>()
-                .WithMessage("*not supported on Apple platform*");
+                .WithMessage("*not supported by NSUserNotificationCenter*");
         }
 
         [Fact]
@@ -170,6 +192,38 @@ namespace DesktopNotifications.Tests
             
             act1.Should().NotThrow();
             act2.Should().NotThrow();
+        }
+
+        [Fact]
+        public void IsSupported_ShouldReturnCorrectValue()
+        {
+            // Act
+            var isSupported = AppleNotificationManager.IsSupported();
+
+            // Assert
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                // On macOS, it should return true if NSUserNotificationCenter is available
+                isSupported.Should().BeTrue();
+            }
+            else
+            {
+                // On non-macOS platforms, it should return false
+                isSupported.Should().BeFalse();
+            }
+        }
+
+        [Fact]
+        public async Task ShowNotification_WithoutInitialization_ShouldThrowInvalidOperationException()
+        {
+            // Arrange
+            using var manager = new AppleNotificationManager();
+            var notification = new Notification { Title = "Test", Body = "Test" };
+
+            // Act & Assert
+            var act = async () => await manager.ShowNotification(notification);
+            await act.Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("*not initialized*");
         }
     }
 } 

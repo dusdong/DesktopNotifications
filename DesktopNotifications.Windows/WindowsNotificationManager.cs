@@ -19,8 +19,8 @@ namespace DesktopNotifications.Windows
         private const int LaunchNotificationWaitMs = 5_000;
         private readonly WindowsApplicationContext _applicationContext;
         private readonly TaskCompletionSource<string>? _launchActionPromise;
-        private readonly Dictionary<ToastNotification, Notification> _notifications;
-        private readonly Dictionary<ScheduledToastNotification, Notification> _scheduledNotification;
+        private readonly BidirectionalDictionary<ToastNotification, Notification> _notifications;
+        private readonly BidirectionalDictionary<ScheduledToastNotification, Notification> _scheduledNotification;
 
 #if NETSTANDARD
         private readonly ToastNotifier _toastNotifier;
@@ -54,8 +54,8 @@ namespace DesktopNotifications.Windows
             _toastNotifier = ToastNotificationManagerCompat.CreateToastNotifier();
 #endif
 
-            _notifications = new Dictionary<ToastNotification, Notification>();
-            _scheduledNotification = new Dictionary<ScheduledToastNotification, Notification>();
+            _notifications = new BidirectionalDictionary<ToastNotification, Notification>();
+            _scheduledNotification = new BidirectionalDictionary<ScheduledToastNotification, Notification>();
         }
 
         public NotificationManagerCapabilities Capabilities => NotificationManagerCapabilities.BodyText |
@@ -95,19 +95,22 @@ namespace DesktopNotifications.Windows
             toastNotification.Failed += ToastNotificationOnFailed;
 
             _toastNotifier.Show(toastNotification);
-            _notifications[toastNotification] = notification;
+            _notifications.Add(toastNotification, notification);
 
             return Task.CompletedTask;
         }
 
         public Task HideNotification(Notification notification)
         {
-            if (_notifications.TryGetKey(notification, out var toastNotification))
+            if (notification == null)
+                throw new ArgumentNullException(nameof(notification));
+
+            if (_notifications.TryGetBySecond(notification, out var toastNotification))
             {
                 _toastNotifier.Hide(toastNotification);
             }
 
-            if (_scheduledNotification.TryGetKey(notification, out var scheduledToastNotification))
+            if (_scheduledNotification.TryGetBySecond(notification, out var scheduledToastNotification))
             {
                 _toastNotifier.RemoveFromSchedule(scheduledToastNotification);
             }
@@ -142,7 +145,7 @@ namespace DesktopNotifications.Windows
             };
 
             _toastNotifier.AddToSchedule(toastNotification);
-            _scheduledNotification[toastNotification] = notification;
+            _scheduledNotification.Add(toastNotification, notification);
 
             return Task.CompletedTask;
         }
@@ -253,12 +256,12 @@ namespace DesktopNotifications.Windows
 
         private void ToastNotificationOnDismissed(ToastNotification sender, ToastDismissedEventArgs args)
         {
-            if (!_notifications.TryGetValue(sender, out var notification))
+            if (!_notifications.TryGetByFirst(sender, out var notification))
             {
                 return;
             }
 
-            _notifications.Remove(sender);
+            _notifications.RemoveByFirst(sender);
 
             var reason = args.Reason switch
             {
@@ -278,7 +281,7 @@ namespace DesktopNotifications.Windows
 
         private void ToastNotificationOnActivated(ToastNotification sender, object args)
         {
-            if (!_notifications.TryGetValue(sender, out var notification))
+            if (!_notifications.TryGetByFirst(sender, out var notification))
             {
                 return;
             }

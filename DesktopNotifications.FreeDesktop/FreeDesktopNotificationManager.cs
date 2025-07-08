@@ -23,7 +23,7 @@ namespace DesktopNotifications.FreeDesktop
                 { "icon", NotificationManagerCapabilities.Icon }
             };
 
-        private readonly Dictionary<uint, Notification> _activeNotifications;
+        private readonly BidirectionalDictionary<uint, Notification> _activeNotifications;
         private readonly FreeDesktopApplicationContext _appContext;
         private Connection? _connection;
         private IDisposable? _notificationActionSubscription;
@@ -37,7 +37,7 @@ namespace DesktopNotifications.FreeDesktop
         public FreeDesktopNotificationManager(FreeDesktopApplicationContext? appContext = null)
         {
             _appContext = appContext ?? FreeDesktopApplicationContext.FromCurrentProcess();
-            _activeNotifications = new Dictionary<uint, Notification>();
+            _activeNotifications = new BidirectionalDictionary<uint, Notification>();
         }
 
         public void Dispose()
@@ -111,14 +111,17 @@ namespace DesktopNotifications.FreeDesktop
                 (int?) duration?.TotalMilliseconds ?? 0
             ).ConfigureAwait(false);
 
-            _activeNotifications[id] = notification;
+            _activeNotifications.Add(id, notification);
         }
 
         public async Task HideNotification(Notification notification)
         {
+            if (notification == null)
+                throw new ArgumentNullException(nameof(notification));
+
             CheckConnection();
 
-            if (_activeNotifications.TryGetKey(notification, out var id))
+            if (_activeNotifications.TryGetBySecond(notification, out var id))
             {
                 await _proxy!.CloseNotificationAsync(id);
             }
@@ -208,9 +211,9 @@ namespace DesktopNotifications.FreeDesktop
 
         private void OnNotificationClosed((uint id, uint reason) @event)
         {
-            if (!_activeNotifications.TryGetValue(@event.id, out var notification)) return;
+            if (!_activeNotifications.TryGetByFirst(@event.id, out var notification)) return;
 
-            _activeNotifications.Remove(@event.id);
+            _activeNotifications.RemoveByFirst(@event.id);
 
             //TODO: Not sure why but it calls this event twice sometimes
             //In this case the notification has already been removed from the dict.
@@ -232,7 +235,7 @@ namespace DesktopNotifications.FreeDesktop
 
         private void OnNotificationActionInvoked((uint id, string actionKey) @event)
         {
-            if (!_activeNotifications.TryGetValue(@event.id, out var notification)) return;
+            if (!_activeNotifications.TryGetByFirst(@event.id, out var notification)) return;
 
             NotificationActivated?.Invoke(this,
                 new NotificationActivatedEventArgs(notification, @event.actionKey));

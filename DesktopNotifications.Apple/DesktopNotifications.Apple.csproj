@@ -15,6 +15,7 @@
 	<PropertyGroup>
 		<Nullable>enable</Nullable>
 		<LangVersion>latestmajor</LangVersion>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Description>A cross-platform C# library for native desktop "toast" notifications.</Description>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
