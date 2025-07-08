@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/.." vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../Ava.Controls-Eremex" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../Ava.Controls-Eremex/Eremex.Avalonia.Themes.DeltaDesign" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../Ava.Controls-Eremex/Eremex.Controls" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../Ava.Controls-Eremex/Eremex.Controls-Demo" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../FluentAvalonia" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../Icons.Avalonia" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../Semi.Avalonia" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../StabilityMatrix" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../Ursa-docs" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../Ursa.Avalonia" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../WalletWasabi" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../v2rayN" vcs="Git" />
+  </component>
+</project>
